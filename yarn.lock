@@ -3111,13 +3111,6 @@ vite-plugin-inspect@0.8.8:
     picocolors "^1.1.1"
     sirv "^3.0.0"
 
-vite-plugin-pdf@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-pdf/-/vite-plugin-pdf-0.1.0.tgz#38327d665e41b7d4eba1d3df8b668dc90d84e036"
-  integrity sha512-6chMMAfBVzEJBTw2QlYRDjfp/7gVTL9l1K3hyBDW5ZR3jVbOlkEUFdZpKFbbZjl0vY+LN2K+0b8Hv4FLgjZZTA==
-  dependencies:
-    picocolors "^1.0.0"
-
 vite-plugin-vue-devtools@^7.6.5:
   version "7.6.7"
   resolved "https://registry.yarnpkg.com/vite-plugin-vue-devtools/-/vite-plugin-vue-devtools-7.6.7.tgz#dce3162f50cf6798811692a59928f25c6893c004"

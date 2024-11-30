@@ -39,7 +39,7 @@ async function handleFileUpload(event: Event) {
     for (let i = 0; i < pdfDoc.numPages; i++) {
       const page = await pdfDoc.getPage(i + 1)
       const textContent = await page.getTextContent()
-      let lastY = null
+      let lastY: any = null
       textContent.items.forEach((item: any) => {
         if (lastY !== null && item.transform[5] !== lastY) {
           combinedTextContent += '\n' // 當前文本項的 Y 坐標與上一個不同時換行
@@ -55,7 +55,8 @@ async function handleFileUpload(event: Event) {
 
 function downloadCSV() {
   if (csvData.value) {
-    const blob = new Blob([csvData.value.join('\n')], { type: 'text/csv' })
+    const bom = '\uFEFF' // UTF-8 BOM
+    const blob = new Blob([bom + csvData.value.join('\n')], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -90,14 +91,24 @@ function convertCSVData(data: SectionData): string[] {
   for (const registration of data.registrations) {
     logData += `, ${registration.owner}, ${registration.identifyNumber}, ${registration.registrationDate}, ${registration.registrationReason}, ${registration.denominator}, ${registration.numerator}`;
 
-    const rightRatio = registration.numerator / registration.denominator;
-    const percentage = (rightRatio * 100).toFixed(2) + '%';
+    let rightRatio = 1
+    let percentage = ''
+    if (registration.numerator && registration.denominator) {
+      rightRatio = registration.numerator / registration.denominator;
+      percentage = (rightRatio * 100).toFixed(2) + '%';
+    }
     logData += `, ${percentage}`;
 
-    const rightArea = (rightRatio * parseFloat(data.area.replace(/,/g, ''))).toFixed(3);
+    let rightArea = ''
+    if (data.area) {
+      rightArea = (rightRatio * parseFloat(data.area.replace(/,/g, ''))).toFixed(3);
+    }
     logData += `, ${quoteIfNeeded(rightArea)}`;
 
-    const rightAreaInPing = (rightRatio * parseFloat(data.areaInPing)).toFixed(3);
+    let rightAreaInPing = ''
+    if (data.areaInPing) {
+      rightAreaInPing = (rightRatio * parseFloat(data.areaInPing)).toFixed(3);
+    }
     logData += `, ${rightAreaInPing}`;
     logData += `, ${registration.address ?? ''}`;
 
