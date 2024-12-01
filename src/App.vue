@@ -24,6 +24,7 @@ interface SectionData {
   registrations: RegistrationData[];
 }
 
+const pdfName = ref<string>('')
 const csvData = ref<string[]>([])
 const isProcessing = ref<boolean>(false)
 
@@ -31,6 +32,7 @@ async function handleFileUpload(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (file && file.type === 'application/pdf') {
     isProcessing.value = true
+    pdfName.value = file.name.substring(0, file.name.lastIndexOf('.'))
     const arrayBuffer = await file.arrayBuffer()
     const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
     let combinedTextContent = '' // 用於存儲所有頁面的文本內容
@@ -60,9 +62,12 @@ function downloadCSV() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'data.csv'
+    a.download = `${pdfName.value}.csv`
     a.click()
     URL.revokeObjectURL(url)
+
+    csvData.value = []
+    pdfName.value = ''
   }
 }
 
@@ -137,6 +142,7 @@ function processSection(section: string): SectionData[] {
     if (title === '土地標示部') {
       area = processLine(part, '面   積：', /\*{4,}\s*([\d,]+\.\d+)\s*平方公尺/);
       if (area) {
+        area = area.replace(/,/g, '');
         areaInPing = convertToPing(area);
       }
     } else if (title === '土地所有權部') {
@@ -218,7 +224,7 @@ function processLine(section: string, keyword: string, pattern: RegExp): string 
 
 // 將平方公尺轉換為坪數
 function convertToPing(area: string): string {
-  const areaInSquareMeters = parseFloat(area.replace(/,/g, ''));
+  const areaInSquareMeters = parseFloat(area);
   const areaInPing = areaInSquareMeters / 3.305785;
   return areaInPing.toFixed(3); // 保留3位小數
 }
@@ -281,7 +287,7 @@ function quoteIfNeeded(value: string | null): string {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  margin-top: 100px;
   height: 100vh;
 }
 
